@@ -9,9 +9,9 @@ namespace Semaphore_Task2_1
         private List<int> buffer = new List<int>();
         private SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
 
-        public void Producer()
+        public void Producer(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
                 semaphore.Wait();
                 buffer.Add(new Random().Next(0, 100));
@@ -21,16 +21,15 @@ namespace Semaphore_Task2_1
             }
         }
 
-        public void Consumer()
+        public void Consumer(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
                 semaphore.Wait();
                 if (buffer.Count > 0)
                 {
                     buffer.RemoveAt(0);
                 }
-
                 semaphore.Release();
                 Console.WriteLine("Thread " + Environment.CurrentManagedThreadId + " consumed value.");
                 Thread.Sleep(1000);
